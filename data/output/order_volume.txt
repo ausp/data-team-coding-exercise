@@ -1,0 +1,10 @@
+Orange:186
+Black:186
+Blue:191
+Purple:182
+Green:195
+Brown:169
+White:173
+Red:194
+Yellow:172
+Gold:182
