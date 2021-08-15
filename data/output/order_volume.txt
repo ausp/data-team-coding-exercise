@@ -1,0 +1,10 @@
+Orange:5121
+Black:4773
+Blue:5084
+Purple:4808
+Green:4948
+Brown:4316
+White:4587
+Red:4817
+Yellow:4474
+Gold:4464
