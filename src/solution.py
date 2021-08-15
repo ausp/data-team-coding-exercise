@@ -32,35 +32,25 @@ def run_pipeline(
     orders_location: str,
     output_location: str,
 ):
-    print(components_location, orders_location, output_location)
 
     # pd.read_json(orders_location).show()
 
     df_components = load_file_from_dataframe(components_location, file_format="csv")
-    print(df_components)
-    df_components = df_components[["componentId", "colour"]]
+    df_components = df_components[["componentId", "colour"]]  # Discard non-required columns to speed solution
 
     df_orders = load_file_from_dataframe(orders_location, "json")
-    print(df_orders)
-    df_orders = df_orders[["timestamp", "units"]]
+    df_orders = df_orders[["timestamp", "units"]]  # Discard non-required columns to speed solution
 
+    # Filter required data and drop timestamp column
     df_orders_single_day = extract_day_from_dataframe(df_orders, "2021-06-03", "timestamp")[["units"]]
-    print(df_orders_single_day)
-
-    # df_orders_single_day.drop("timestamp", axis=1, inplace=True)
-    # print(df_orders_single_day)
 
     df_orders_normalised = pd.json_normalize(df_orders_single_day["units"])
-    print(df_orders_normalised)
 
-    component_id_list = df_components["componentId"].tolist()
-    print(component_id_list)
-
-    df_orders_counted = df_orders_normalised.count(axis=0).to_frame()
-    print(df_orders_counted)
+    # Sum the parts ordered and convert outputs to ints
+    df_orders_counted = df_orders_normalised.sum(axis=0).to_frame()
+    df_orders_counted[0] = df_orders_counted[0].astype("int")
 
     df_joined = df_orders_counted.join(df_components.set_index("componentId"))[["colour", 0]]
-    print(df_joined)
 
     write_dataframe_to_file(
         df_joined, file_location=output_location, file_format="csv", header=False, mode="w", sep=":"
