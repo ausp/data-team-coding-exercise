@@ -1,37 +1,41 @@
-# Data team coding exercise
+# Load/transform/write files (Pandas)
 
-## Background
+### Prerequisites
 
-You've been hired as a data engineer for **PLAYWIBRIX**, a company who manufacture plastic components for construction toys.
+#### Python 3.6.* or later.
 
-There are grander plans for their data... but for now you've been tasked to process some information about components and orders, and to **create a simple output detailing how many units of each coloured component that were ordered on 3rd June 2021**.
+See installation instructions at: https://www.python.org/downloads/
 
-You've been given two data sets, which are available in https://github.com/qmetric/data-team-coding-exercise/tree/main/data:
+Check installation:
 
-`components.csv` - A reference data set in CSV containing some information about the components the company manufactures. For this task you'll be interested in the component ID and the colour of the component.
-
-`orders.json.txt` - A file containing lines of JSON records. Each record represents an order of a number of units of different components. The file covers a period over 2nd to 4th June 2021
-
-So just as an example, your output could look like:
-
-```
-Red: 500
-Orange: 700
-...
+```bash
+python3 --version
 ```
 
----
+#### Installing Python requirements
 
-## The finer details...
+```bash
+pip3 install -r ./requirements.txt
+```
 
-Please use (preferably) Python, or Java to complete this exercise.
+#### Running tests
 
-**You are free to use any data processing frameworks or libraries as you like.**
+```bash
+python -m pytest ./test
+```
 
-Please supply a git repository where we can find your submission, and provide instructions to run your code to produce the output required.
+### Running solution
 
-Aside from the practicalities of the exercise, we will be assessing your approach to software engineering... but please don't spend longer than a couple of hours on this task.
+Run the below from the repository's root directory.
 
-Most of all, we'd really love to see a clean, tested, codebase, with a maintainable design. And expect to extend your submission in a future exercise.
+```bash
+# Basic run:
+python ./src/solution.py
 
-Good luck!
+# Default arguments:
+python ./src/solution.py --components_location=./data/input/components.csv --orders_location=./data/input/orders.json.txt --output_location=./data/output/order_volume.txt
+```
+
+The output of this program will be placed in the filepath given in `--output_location`.
+
+Any pushes to `main` will be checked (and possibly corrected) by `./.github/workflows/ci.yaml`.
