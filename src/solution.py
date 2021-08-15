@@ -2,7 +2,7 @@ import pandas as pd
 from pandas import json_normalize
 import argparse
 
-from . import helper_functions as hf
+import helper_functions as hf
 
 
 def run_pipeline(
@@ -20,15 +20,11 @@ def run_pipeline(
     # Filter required data and drop timestamp column, which is no longer required
     df_orders_single_day = hf.extract_day_from_dataframe(df_orders, "2021-06-03", "timestamp")[["units"]]
 
-    # Normalise the 'units' column to split apart the kv pairs
-    df_orders_normalised = pd.json_normalize(df_orders_single_day["units"])
-
-    # Sum the parts ordered and convert output to ints
-    df_orders_counted = df_orders_normalised.sum(axis=0).to_frame()
-    df_orders_counted[0] = df_orders_counted[0].astype("int")
+    # shape the orders df into a usable summary
+    df_orders_result = hf.process_orders(df_orders_single_day, col_name="units")
 
     # Join dataframes to obtain the colours of each componentId
-    df_joined = df_orders_counted.join(df_components.set_index("componentId"))[["colour", 0]]
+    df_joined = df_orders_result.join(df_components.set_index("componentId"))[["colour", 0]].sort_values("colour")
 
     # Write output to file at provided location.
     hf.write_dataframe_to_file(

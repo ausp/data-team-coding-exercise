@@ -23,3 +23,14 @@ def write_dataframe_to_file(
 
 def extract_day_from_dataframe(df: pd.DataFrame, day: str, col: str) -> pd.DataFrame:
     return df[df[col].dt.date == pd.to_datetime(day).date()]
+
+
+def process_orders(df, col_name):
+
+    # Normalise the 'units' column to split apart the kv pairs
+    df_orders_normalised = pd.json_normalize(df[col_name])
+
+    # Sum the parts ordered and convert output to ints
+    df_orders_counted = df_orders_normalised.sum(axis=0).to_frame()
+    df_orders_counted[0] = df_orders_counted[0].astype("int")
+    return df_orders_counted
