@@ -1,0 +1,66 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# Depending on setup and cost considerations, Actions here can be transferred to the equivalent in-house/cloud platform (Jenkins, CircleCI, Build etc.)
+
+name: Python Lint/Format/Test
+
+on:
+  push:
+    branches: [main, cicd-init]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # In-house CLI tool and job run in controlled runtime env - probably don't need the below for checking multiple version compatibility
+    # strategy:
+    #   fail-fast: false
+    #   matrix:
+    #     python-version: [3.7, 3.8, 3.9]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.9
+        id: setupPython
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install Python dependencies
+        id: pythonDependencyInstall
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest black
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Lint with flake8
+        id: flake8Lint
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=119 --statistics
+
+      - name: Check formatting with Black
+        id: blackCheck
+        continue-on-error: true # For use with autoformatter below ONLY
+        run: black --check --line-length=119 . # Change to team standard, GH code review width is 119
+
+      # Likely too much, but nice to have the option to enforce if need be.
+      - name: Reformat with Black
+        id: blackReformat
+        if: steps.blackCheck.outcome == 'failure'
+        run: |
+          black --line-length=119 .
+          git config --global user.name 'autoblack'
+          git config --global user.email 'git-user@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git checkout $GITHUB_HEAD_REF
+          git commit -am "fixup: (auto commit) Reformat Python code with Black"
+          git push
+
+      - name: Test with pytest
+        id: pytest
+        run: |
+          pytest
