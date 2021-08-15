@@ -1,6 +1,7 @@
+import argparse
+
 import pandas as pd
 from pandas import json_normalize
-import argparse
 
 import helper_functions as hf
 
@@ -20,7 +21,7 @@ def run_pipeline(
     # Filter required data and drop timestamp column, which is no longer required
     df_orders_single_day = hf.extract_day_from_dataframe(df_orders, "2021-06-03", "timestamp")[["units"]]
 
-    # shape the orders df into a usable summary
+    # Shape the orders dataframe into the required summary
     df_orders_result = hf.process_orders(df_orders_single_day, col_name="units")
 
     # Join dataframes to obtain the colours of each componentId

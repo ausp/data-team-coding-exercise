@@ -26,7 +26,6 @@ def extract_day_from_dataframe(df: pd.DataFrame, day: str, col: str) -> pd.DataF
 
 
 def process_orders(df, col_name):
-
     # Normalise the 'units' column to split apart the kv pairs
     df_orders_normalised = pd.json_normalize(df[col_name])
 

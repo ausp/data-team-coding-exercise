@@ -1,8 +1,8 @@
 import shutil
 from tempfile import mkdtemp
 
-import pytest
 import pandas as pd
+import pytest
 
 
 @pytest.fixture(scope="function")
